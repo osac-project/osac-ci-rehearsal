@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sweep:
-    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@0bc0855fe814f8050d686bb9b48769ce2c1adefe  # manual-run-comment (fork)
+    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@aefe306410fd57741b7d10700e5d376154625630  # manual-run-comment
     permissions:
       contents: read
       pull-requests: read

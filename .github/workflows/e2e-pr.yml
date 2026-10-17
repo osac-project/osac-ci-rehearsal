@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@0bc0855fe814f8050d686bb9b48769ce2c1adefe  # manual-run-comment (fork)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@aefe306410fd57741b7d10700e5d376154625630  # manual-run-comment
     permissions:
       contents: read
       pull-requests: read
@@ -35,7 +35,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@0bc0855fe814f8050d686bb9b48769ce2c1adefe  # manual-run-comment (fork)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@aefe306410fd57741b7d10700e5d376154625630  # manual-run-comment
     permissions:
       contents: read
     with:
@@ -86,7 +86,7 @@ jobs:
   finish:
     needs: [decide, track, alpha, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@0bc0855fe814f8050d686bb9b48769ce2c1adefe  # manual-run-comment (fork)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@aefe306410fd57741b7d10700e5d376154625630  # manual-run-comment
     permissions:
       contents: read
     with:
