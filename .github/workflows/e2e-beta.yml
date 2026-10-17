@@ -23,7 +23,9 @@ jobs:
       - env:
           AUTHOR: ${{ inputs.fork-pr-author }}
           ASSOC: ${{ inputs.fork-pr-author-association }}
+          EVENT: ${{ github.event_name }}
         run: |
           echo "the stub suite beta runs for ${{ inputs.sha }} of ${{ inputs.repo }} (PR ${{ inputs.pr-number }}); fork author='${AUTHOR}' association='${ASSOC}'"
           sleep 40
+          if [ "${EVENT}" = merge_group ] && [ -e beta/queue-fail ]; then echo "beta/queue-fail exists: the stub fails in the merge queue only"; exit 1; fi
           if [ "beta" = beta ] && [ -e beta/fail ]; then echo "beta/fail exists: the stub suite fails on purpose"; exit 1; fi
