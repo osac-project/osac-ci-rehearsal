@@ -15,3 +15,8 @@ jobs:
     suite: beta
     filters: [beta-touched]
     filters_any: [e2e-code]
+  e2e-gamma:
+    kind: e2e
+    check: "E2E / Gamma Stub"
+    suite: gamma
+    manual_only: true
