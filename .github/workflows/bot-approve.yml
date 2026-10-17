@@ -15,11 +15,13 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sweep:
-    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@ec980b4ab20ad5882d661684dc1060512634e787  # v1.1.0
+    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@2a5e838382ec18217a0161183f0b777dc5d3eead  # bot-sweep-app-token
     permissions:
       contents: read
       pull-requests: read
     with:
       number: ${{ inputs.number }}
+      konflux-prep: true
+      konflux-login: eliorerz  # rehearsal: my own pull requests stand in for Konflux's
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
