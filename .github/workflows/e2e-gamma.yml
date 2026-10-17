@@ -1,0 +1,29 @@
+---
+name: E2E Gamma Stub
+on:
+  workflow_call:
+    inputs:
+      repo: {type: string, required: true}
+      sha: {type: string, required: true}
+      pr-number: {type: string, default: ""}
+      fork-pr-author: {type: string, default: ""}
+      fork-pr-author-association: {type: string, default: ""}
+permissions:
+  contents: read
+jobs:
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.sha }}
+          persist-credentials: false
+      - env:
+          SHA: ${{ inputs.sha }}
+          REPO: ${{ inputs.repo }}
+          PR: ${{ inputs.pr-number }}
+        run: |
+          echo "the stub suite gamma (started by hand only) runs for ${SHA} of ${REPO} (PR ${PR})"
+          sleep 30
