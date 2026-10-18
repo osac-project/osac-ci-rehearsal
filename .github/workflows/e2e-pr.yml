@@ -3,7 +3,7 @@ name: E2E for pull requests
 # The decision cancels the E2E of older commits by reading run titles: keep this exact format.
 run-name: >-
   ${{ github.event_name == 'workflow_dispatch' && format('E2E #{0} (started by hand)', inputs.number) ||
-  github.event_name == 'issue_comment' && format('E2E #{0} (suites checked in the comment)', github.event.issue.number) ||
+  github.event_name == 'issue_comment' && format('E2E #{0} (suites asked for in a comment)', github.event.issue.number) ||
   format('E2E {0}:{1} @ {2}', github.event.workflow_run.head_repository.full_name, github.event.workflow_run.head_branch,
   github.event.workflow_run.head_sha) }}
 
@@ -12,7 +12,7 @@ on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out
     workflows: ["CI", "E2E review relay"]
     types: [requested, completed]
   issue_comment:
-    types: [edited]
+    types: [edited, created]
   workflow_dispatch:
     inputs:
       number:
@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@106f5e078a131ee0c02b7a95edf6889ca840879e  # v1.2.1
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@a3cc609cd8561af16ddfe024589a62c9afed8791  # test-command branch
     permissions:
       contents: read
       pull-requests: read
