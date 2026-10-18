@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@9a7dccc72eadb32673dc4288a04e561e29acdfda  # early-comment
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@d5ce93822ff3c072cf03c4bebe8602aaccd832b6  # early-comment
     permissions:
       contents: read
       pull-requests: read
@@ -35,7 +35,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@9a7dccc72eadb32673dc4288a04e561e29acdfda  # early-comment
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@d5ce93822ff3c072cf03c4bebe8602aaccd832b6  # early-comment
     permissions:
       contents: read
     with:
@@ -86,7 +86,7 @@ jobs:
   finish:
     needs: [decide, track, alpha, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@9a7dccc72eadb32673dc4288a04e561e29acdfda  # early-comment
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@d5ce93822ff3c072cf03c4bebe8602aaccd832b6  # early-comment
     permissions:
       contents: read
     with:
