@@ -23,7 +23,9 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@aeea26af70a5b31de269ba72c5dd625d02296f62  # v1.2.7
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@e1568b17b5ab8edf4c63f214110494b4204fe73f  # org branch suite-lines-statuses of osac-ci, temporary
+    with:
+      lines-kind: statuses
     permissions:
       contents: read
       pull-requests: read
@@ -35,10 +37,11 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@aeea26af70a5b31de269ba72c5dd625d02296f62  # v1.2.7
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@e1568b17b5ab8edf4c63f214110494b4204fe73f  # org branch suite-lines-statuses of osac-ci, temporary
     permissions:
       contents: read
     with:
+      lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
     secrets:
@@ -86,10 +89,11 @@ jobs:
   finish:
     needs: [decide, track, alpha, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@aeea26af70a5b31de269ba72c5dd625d02296f62  # v1.2.7
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@e1568b17b5ab8edf4c63f214110494b4204fe73f  # org branch suite-lines-statuses of osac-ci, temporary
     permissions:
       contents: read
     with:
+      lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
       suites: ${{ needs.decide.outputs.suites }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
