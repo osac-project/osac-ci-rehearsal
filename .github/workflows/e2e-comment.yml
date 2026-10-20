@@ -1,0 +1,17 @@
+# Posts the placeholder of the E2E control comment the moment a pull request opens, so it lands above the comments of
+# the bots that post a few seconds later. The shared workflow does the work (osac-ci docs/CALLERS.md); the finished run
+# is deleted by e2e-pr.yml (this workflow is in its workflow_run list), so its row does not stay on the pull request.
+name: E2E comment
+
+on:  # zizmor: ignore[dangerous-triggers] -- runs from the default branch and checks out nothing of the pull request
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions: {}
+
+jobs:
+  comment:
+    uses: eliorerz/osac-ci/.github/workflows/e2e-pr-comment.yml@bdf7cb83756e1ede1f09183ea2fb8556713abfe6  # early-comment-fast, temporary
+    permissions: {}
+    secrets:
+      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}

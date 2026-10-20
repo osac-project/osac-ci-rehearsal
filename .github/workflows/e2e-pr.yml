@@ -9,7 +9,7 @@ run-name: >-
 
 on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out; the suites run the approved commit
   workflow_run:
-    workflows: ["CI", "E2E review relay"]
+    workflows: ["CI", "E2E review relay", "E2E comment"]
     types: [requested, completed]
   issue_comment:
     types: [edited, created]
@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@639e33f549c91a5c1e8b4ad55256b69f028a42b8  # v1.2.4
+    uses: eliorerz/osac-ci/.github/workflows/e2e-pr-decide.yml@bdf7cb83756e1ede1f09183ea2fb8556713abfe6  # early-comment-fast, temporary
     permissions:
       contents: read
       pull-requests: read
