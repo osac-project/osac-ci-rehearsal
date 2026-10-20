@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@877289084e2ab958e3bfdcf61e9d4c056aff6df2  # branch ci-status-in-comment of osac-ci, temporary
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@f528543f76db3a673b3aca78a52faade995d6053  # branch auto-merge-optout of osac-ci, temporary
     permissions:
       contents: read
       pull-requests: read
