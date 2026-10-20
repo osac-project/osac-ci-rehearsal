@@ -23,7 +23,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@ded059643ed98a39700a0bb1c64b96c0918993c0  # v1.2.8
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@78d3e1680a902ce6fe561c864e7b0f17e3089f19  # org branch merge-queue-row of osac-ci, temporary
     with:
       lines-kind: statuses
     permissions:
