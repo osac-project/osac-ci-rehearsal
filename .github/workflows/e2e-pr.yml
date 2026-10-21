@@ -28,7 +28,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@d78fb1f99d4ca606be6c65496be628259325e302  # org branch run-names of osac-ci, temporary
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@e52502d3820b325a5e239a73b8c8e70ce2623749  # org branch rehearsal-combined of osac-ci, temporary
     with:
       lines-kind: statuses
     permissions:
