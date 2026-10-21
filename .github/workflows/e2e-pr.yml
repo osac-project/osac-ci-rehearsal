@@ -1,13 +1,12 @@
 ---
 name: E2E for pull requests
-# The decision cancels the E2E of older commits by the commit a run title ENDS with (` @ <head sha>`); the rest is free.
+# The title is for people: the decision does not read it (it finds the run of an older commit by that commit's E2E line).
 run-name: >-
   ${{ github.event_name == 'workflow_dispatch' && format('E2E #{0} (started by hand)', inputs.number) ||
   github.event_name == 'issue_comment' && format('E2E #{0} (suites asked for in a comment)', github.event.issue.number) ||
-  github.event.workflow_run.pull_requests[0].number && format('E2E #{0} · {1} @ {2}',
-  github.event.workflow_run.pull_requests[0].number, github.event.workflow_run.display_title,
-  github.event.workflow_run.head_sha) ||
-  format('E2E · {0} @ {1}', github.event.workflow_run.display_title, github.event.workflow_run.head_sha) }}
+  github.event.workflow_run.pull_requests[0].number && format('E2E #{0} · {1}',
+  github.event.workflow_run.pull_requests[0].number, github.event.workflow_run.head_branch) ||
+  format('E2E · {0}:{1}', github.event.workflow_run.head_repository.owner.login, github.event.workflow_run.head_branch) }}
 
 on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out; the suites run the approved commit
   workflow_run:
@@ -28,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@e52502d3820b325a5e239a73b8c8e70ce2623749  # org branch rehearsal-combined of osac-ci, temporary
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@c896624bd95bf2ae36fae97994d5e8b10a574507  # org branch rehearsal-combined of osac-ci, temporary
     with:
       lines-kind: statuses
     permissions:
