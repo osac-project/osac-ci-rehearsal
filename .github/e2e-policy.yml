@@ -9,6 +9,15 @@ jobs:
     check: "E2E / Alpha Stub"
     suite: alpha
     filters_any: [e2e-code]
+  # A second box for alpha: the same suite and line, asked for its full tier.
+  e2e-alpha-full:
+    kind: e2e
+    check: "E2E / Alpha Stub"
+    suite: alpha-full
+    manual_only: true
+    variant_of: alpha
+    tier: full
+    label: "Alpha Stub · full"
   e2e-beta:
     kind: e2e
     check: "E2E / Beta Stub"
