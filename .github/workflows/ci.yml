@@ -33,4 +33,7 @@ jobs:
         run: |
           if [ "${PARTS}" != success ]; then echo "a part did not pass: ${PARTS}"; exit 1; fi
       - run: echo "the cheap checks of the rehearsal repository"
-      - run: sleep 20
+      - env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "${EVENT}" = merge_group ]; then sleep 150; else sleep 20; fi
