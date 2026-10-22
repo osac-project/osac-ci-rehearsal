@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sweep:
-    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@7441ea44f5c6c1bdce7aef3272248968b44fc52b  # suite-variants (test)
+    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@38aade30cf2fb9bf60f8aa561a8e48048645bd74  # suite-variants (test)
     permissions:
       contents: read
       pull-requests: read
