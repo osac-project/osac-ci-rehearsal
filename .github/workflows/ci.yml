@@ -19,10 +19,18 @@ jobs:
         run: |
           sleep 10
           if [ "${EVENT}" = merge_group ] && [ -e ci-queue-fail ]; then echo "ci-queue-fail exists: the unit tests fail in the merge queue"; exit 1; fi
+  # Like the CI job of osac: it runs whatever the parts did and fails when one failed (a skipped required check would
+  # count as passed).
   CI:
     name: CI
     needs: unit-tests
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
+      - name: Every part passed
+        env:
+          PARTS: ${{ needs.unit-tests.result }}
+        run: |
+          if [ "${PARTS}" != success ]; then echo "a part did not pass: ${PARTS}"; exit 1; fi
       - run: echo "the cheap checks of the rehearsal repository"
       - run: sleep 20
