@@ -5,7 +5,7 @@ on:
 permissions: {}
 jobs:
   plan:
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@e27c170b083391ffaf0341f3e62db11ffa8b85aa  # suite-variants (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@000ce82e9ca0ad61683a6d568b34fdb4ebc3f056  # suite-variants (test)
     permissions:
       contents: read
       actions: write
@@ -33,7 +33,7 @@ jobs:
   finish:
     needs: [plan, alpha, beta]
     if: always()
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-finish.yml@e27c170b083391ffaf0341f3e62db11ffa8b85aa  # suite-variants (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-finish.yml@000ce82e9ca0ad61683a6d568b34fdb4ebc3f056  # suite-variants (test)
     permissions:
       contents: read
     with:
