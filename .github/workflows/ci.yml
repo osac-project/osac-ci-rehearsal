@@ -1,4 +1,3 @@
----
 name: CI
 on:
   pull_request:
@@ -7,8 +6,22 @@ on:
 permissions:
   contents: read
 jobs:
+  # A test job that fails in the merge queue only, when ci-queue-fail exists (to try stopping a queue entry for it).
+  unit-tests:
+    name: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          sleep 10
+          if [ "${EVENT}" = merge_group ] && [ -e ci-queue-fail ]; then echo "ci-queue-fail exists: the unit tests fail in the merge queue"; exit 1; fi
   CI:
     name: CI
+    needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - run: echo "the cheap checks of the rehearsal repository"
