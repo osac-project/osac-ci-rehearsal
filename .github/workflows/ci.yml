@@ -25,4 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "the cheap checks of the rehearsal repository"
-      - run: sleep 20
+      - env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "${EVENT}" = merge_group ]; then sleep 150; else sleep 20; fi
