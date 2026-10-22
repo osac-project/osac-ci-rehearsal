@@ -25,8 +25,9 @@ jobs:
           AUTHOR: ${{ inputs.fork-pr-author }}
           ASSOC: ${{ inputs.fork-pr-author-association }}
           TIER: ${{ inputs.tier }}
+          EVENT: ${{ github.event_name }}
         run: |
           echo "tier='${TIER}'"
           echo "the stub suite alpha runs for ${{ inputs.sha }} of ${{ inputs.repo }} (PR ${{ inputs.pr-number }}); fork author='${AUTHOR}' association='${ASSOC}'"
-          sleep 40
+          if [ "${EVENT}" = merge_group ]; then sleep 180; else sleep 40; fi
           if [ "alpha" = beta ] && [ -e beta/fail ]; then echo "beta/fail exists: the stub suite fails on purpose"; exit 1; fi
