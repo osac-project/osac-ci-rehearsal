@@ -8,6 +8,7 @@ on:
       pr-number: {type: string, default: ""}
       fork-pr-author: {type: string, default: ""}
       fork-pr-author-association: {type: string, default: ""}
+      tier: {type: string, default: ""}
 permissions:
   contents: read
 jobs:
@@ -23,7 +24,9 @@ jobs:
       - env:
           AUTHOR: ${{ inputs.fork-pr-author }}
           ASSOC: ${{ inputs.fork-pr-author-association }}
+          TIER: ${{ inputs.tier }}
         run: |
+          echo "tier='${TIER}'"
           echo "the stub suite alpha runs for ${{ inputs.sha }} of ${{ inputs.repo }} (PR ${{ inputs.pr-number }}); fork author='${AUTHOR}' association='${ASSOC}'"
           sleep 40
           if [ "alpha" = beta ] && [ -e beta/fail ]; then echo "beta/fail exists: the stub suite fails on purpose"; exit 1; fi
