@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@000ce82e9ca0ad61683a6d568b34fdb4ebc3f056  # suite-variants (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@188618f70e65c38f46fb252cfb87e20714c63bd6  # v1.2.13
     with:
       lines-kind: statuses
     permissions:
@@ -41,7 +41,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@000ce82e9ca0ad61683a6d568b34fdb4ebc3f056  # suite-variants (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@188618f70e65c38f46fb252cfb87e20714c63bd6  # v1.2.13
     permissions:
       contents: read
     with:
@@ -94,7 +94,7 @@ jobs:
   finish:
     needs: [decide, track, alpha, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@000ce82e9ca0ad61683a6d568b34fdb4ebc3f056  # suite-variants (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@188618f70e65c38f46fb252cfb87e20714c63bd6  # v1.2.13
     permissions:
       contents: read
     with:
