@@ -5,7 +5,7 @@ on:
 permissions: {}
 jobs:
   plan:
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@67444718fd1cf7305d20f0bfcc393a7d8aa61505  # fail-fast (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@fc16f66528eabb84752843861a4c59d495afb445  # result-job (test)
     permissions:
       contents: read
       actions: write
@@ -30,24 +30,19 @@ jobs:
       repo: ${{ github.repository }}
       sha: ${{ github.event.merge_group.head_sha }}
 
-  # Stops the run as soon as a suite fails, so the entry is told at once (see osac-ci's docs/CALLERS.md).
-  fail-fast:
+  # One job that looks after the entry: watches the suites and the other required checks of the commit, writes E2E at once
+  # on the first failure and stops everything that still runs (see osac-ci's docs/CALLERS.md).
+  result:
     needs: plan
-    if: needs.plan.outputs.suites != '[]'
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-fail-fast.yml@67444718fd1cf7305d20f0bfcc393a7d8aa61505  # fail-fast (test)
+    if: always()
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-result.yml@fc16f66528eabb84752843861a4c59d495afb445  # result-job (test)
     permissions:
       actions: write
-    with:
-      suites: ${{ needs.plan.outputs.suites }}
-
-  finish:
-    needs: [plan, alpha, beta]
-    if: always()
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-finish.yml@67444718fd1cf7305d20f0bfcc393a7d8aa61505  # fail-fast (test)
-    permissions:
       contents: read
     with:
       sha: ${{ github.event.merge_group.head_sha }}
-      results: ${{ toJSON(needs) }}
+      branch: ${{ github.event.merge_group.base_ref }}
+      plan-result: ${{ needs.plan.result }}
+      suites: ${{ needs.plan.outputs.suites }}
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
