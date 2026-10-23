@@ -5,7 +5,7 @@ on:
 permissions: {}
 jobs:
   plan:
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@be24957b2753fedbf12f71e30588a551a4f0c9ae  # hand-guard (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@93e3cc7c4b7d8e2eedc10a528f2474a2c60b86a6  # hand-guard (test)
     permissions:
       contents: read
       actions: write
@@ -35,7 +35,7 @@ jobs:
   result:
     needs: plan
     if: always()
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-result.yml@be24957b2753fedbf12f71e30588a551a4f0c9ae  # hand-guard (test)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-result.yml@93e3cc7c4b7d8e2eedc10a528f2474a2c60b86a6  # hand-guard (test)
     permissions:
       actions: write
       contents: read
