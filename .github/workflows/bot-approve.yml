@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sweep:
-    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@93e3cc7c4b7d8e2eedc10a528f2474a2c60b86a6  # hand-guard (test)
+    uses: osac-project/osac-ci/.github/workflows/bot-sweep.yml@fde6635301d674c8892e0eacbaaab2b06c9165af  # osac-ci tier-text-and-hand-guard
     permissions:
       contents: read
       pull-requests: read
