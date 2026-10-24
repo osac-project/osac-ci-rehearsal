@@ -8,6 +8,7 @@ jobs:
     kind: e2e
     check: "E2E / Alpha Stub"
     suite: alpha
+    workflow: e2e-alpha.yml  # a run of its own, started by the decision
     filters_any: [e2e-code]
   # A second box for alpha: the same suite and line, asked for its full tier.
   e2e-alpha-full:

@@ -1,6 +1,16 @@
 ---
 name: E2E Alpha Stub
+# Started by the decision as a run of its own (workflow_dispatch); the name of the run is how its end is recognised.
+run-name: E2E suite · alpha · #${{ inputs.pr-number }} · ${{ inputs.sha }}
 on:
+  workflow_dispatch:
+    inputs:
+      repo: {type: string, required: true}
+      sha: {type: string, required: true}
+      pr-number: {type: string, default: ""}
+      fork-pr-author: {type: string, default: ""}
+      fork-pr-author-association: {type: string, default: ""}
+      tier: {type: string, default: ""}
   workflow_call:
     inputs:
       repo: {type: string, required: true}
