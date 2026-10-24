@@ -1,0 +1,13 @@
+name: rerun probe
+on:
+  pull_request:
+permissions: {}
+jobs:
+  fails-fast:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "this job fails at once"; exit 1
+  slow:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sleep 240
