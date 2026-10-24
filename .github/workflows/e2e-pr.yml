@@ -28,6 +28,8 @@ permissions: {}
 jobs:
   decide:
     uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@205d5a5073a04bf164cec95d9698af754f87602a  # osac-ci tier-text-and-hand-guard
+    with:
+      lines-kind: statuses
     permissions:
       contents: read
       pull-requests: read
@@ -43,6 +45,7 @@ jobs:
     permissions:
       contents: read
     with:
+      lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
     secrets:
@@ -95,6 +98,7 @@ jobs:
     permissions:
       contents: read
     with:
+      lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
       suites: ${{ needs.decide.outputs.suites }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
