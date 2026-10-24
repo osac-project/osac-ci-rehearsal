@@ -11,7 +11,7 @@ permissions: {}
 
 jobs:
   comment:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@2ae5ba514082c76cc356499aad39a641db099026  # osac-ci service-noise (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@17a98e41645ede0ecdcd6a62b238e8b18306c19d  # osac-ci service-noise (temporary)
     permissions: {}
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}

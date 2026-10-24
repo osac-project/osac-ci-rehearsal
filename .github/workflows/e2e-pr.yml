@@ -27,22 +27,21 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@2ae5ba514082c76cc356499aad39a641db099026  # osac-ci service-noise (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@17a98e41645ede0ecdcd6a62b238e8b18306c19d  # osac-ci service-noise (temporary)
     with:
       lines-kind: statuses
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       checks: read
       actions: write
-      issues: write
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
 
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@2ae5ba514082c76cc356499aad39a641db099026  # osac-ci service-noise (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@17a98e41645ede0ecdcd6a62b238e8b18306c19d  # osac-ci service-noise (temporary)
     permissions:
       contents: read
     with:
@@ -95,10 +94,10 @@ jobs:
   finish:
     needs: [decide, track, alpha, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@2ae5ba514082c76cc356499aad39a641db099026  # osac-ci service-noise (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@17a98e41645ede0ecdcd6a62b238e8b18306c19d  # osac-ci service-noise (temporary)
     permissions:
       contents: read
-      issues: write
+      pull-requests: write
     with:
       lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
