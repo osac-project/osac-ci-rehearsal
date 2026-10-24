@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@08c82a3df4ac952b52272270ce18cab05a0fad18  # osac-ci dispatch-suites (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@752b707daec05612ebd10ea3dc849d75b06e22bd  # osac-ci dispatch-suites (temporary)
     with:
       lines-kind: statuses
     permissions:
@@ -41,7 +41,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@08c82a3df4ac952b52272270ce18cab05a0fad18  # osac-ci dispatch-suites (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@752b707daec05612ebd10ea3dc849d75b06e22bd  # osac-ci dispatch-suites (temporary)
     permissions:
       contents: read
     with:
@@ -82,7 +82,7 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@08c82a3df4ac952b52272270ce18cab05a0fad18  # osac-ci dispatch-suites (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@752b707daec05612ebd10ea3dc849d75b06e22bd  # osac-ci dispatch-suites (temporary)
     permissions:
       contents: read
       pull-requests: write
