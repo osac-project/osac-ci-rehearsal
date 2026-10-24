@@ -10,6 +10,7 @@ on:
       fork-pr-author-association: {type: string, default: ""}
 permissions:
   contents: read
+  statuses: read  # beta/fail-once reads the earlier lines of this suite
 jobs:
   e2e:
     name: e2e
@@ -26,8 +27,10 @@ jobs:
           EVENT: ${{ github.event_name }}
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ inputs.sha }}
+          REPO: ${{ inputs.repo }}
+          PR: ${{ inputs.pr-number }}
         run: |
-          echo "the stub suite beta runs for ${{ inputs.sha }} of ${{ inputs.repo }} (PR ${{ inputs.pr-number }}); fork author='${AUTHOR}' association='${ASSOC}'"
+          printf "the stub suite beta runs for %s of %s (PR %s); fork author='%s' association='%s'\n" "${SHA}" "${REPO}" "${PR}" "${AUTHOR}" "${ASSOC}"
           if [ "${EVENT}" = merge_group ] && [ -e beta/queue-fail ]; then sleep 15; echo "beta/queue-fail exists: the stub fails in the merge queue only"; exit 1; fi
           sleep 40
           if [ "beta" = beta ] && [ -e beta/fail ]; then echo "beta/fail exists: the stub suite fails on purpose"; exit 1; fi
