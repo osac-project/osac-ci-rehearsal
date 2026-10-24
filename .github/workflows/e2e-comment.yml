@@ -11,7 +11,7 @@ permissions: {}
 
 jobs:
   comment:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@9e2b7a6c74f3f4b0b63a559442b022171286985c  # osac-ci sum-from-lines (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@a9c1d7df1acfbb03ce3e0c522e59b7d91452a3e9  # v1.3.1
     permissions: {}
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
