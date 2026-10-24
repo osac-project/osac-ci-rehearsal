@@ -1,0 +1,22 @@
+---
+# SPIKE (delete after): a workflow that starts a suite as a run of its own, with its own token.
+name: Spike starter
+on:
+  workflow_dispatch:
+    inputs:
+      suite: {type: string, required: true}
+      sha: {type: string, required: true}
+permissions:
+  actions: write
+jobs:
+  start:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          SUITE: ${{ inputs.suite }}
+          SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          gh api -i -X POST "repos/${GITHUB_REPOSITORY}/actions/workflows/spike-suite.yml/dispatches" \
+            -f ref=main -f "inputs[suite]=${SUITE}" -f "inputs[sha]=${SHA}" -f "inputs[pr-number]=7" -F return_run_details=true | sed -n '1p;/^{/p'
