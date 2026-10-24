@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@fde6635301d674c8892e0eacbaaab2b06c9165af  # osac-ci tier-text-and-hand-guard
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@937c237932a9a0e0855ee24c508713c3e8b72fcd  # osac-ci tier-text-and-hand-guard
     with:
       lines-kind: statuses
     permissions:
@@ -41,7 +41,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@fde6635301d674c8892e0eacbaaab2b06c9165af  # osac-ci tier-text-and-hand-guard
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@937c237932a9a0e0855ee24c508713c3e8b72fcd  # osac-ci tier-text-and-hand-guard
     permissions:
       contents: read
     with:
@@ -94,7 +94,7 @@ jobs:
   finish:
     needs: [decide, track, alpha, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@fde6635301d674c8892e0eacbaaab2b06c9165af  # osac-ci tier-text-and-hand-guard
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@937c237932a9a0e0855ee24c508713c3e8b72fcd  # osac-ci tier-text-and-hand-guard
     permissions:
       contents: read
     with:
