@@ -5,7 +5,7 @@ on:
 permissions: {}
 jobs:
   plan:
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@17a98e41645ede0ecdcd6a62b238e8b18306c19d  # osac-ci service-noise (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@f6e649d70e2d496e3d2aba6c65c7e0fff409b5b1  # v1.3.0
     permissions:
       contents: read
       actions: write
@@ -35,7 +35,7 @@ jobs:
   result:
     needs: plan
     if: always()
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-result.yml@17a98e41645ede0ecdcd6a62b238e8b18306c19d  # osac-ci service-noise (temporary)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-result.yml@f6e649d70e2d496e3d2aba6c65c7e0fff409b5b1  # v1.3.0
     permissions:
       actions: write
       contents: read
