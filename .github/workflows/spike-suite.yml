@@ -9,8 +9,7 @@ on:
       sha: {type: string, required: true}
       pr-number: {type: string, default: ""}
       sleep: {type: string, default: "25"}
-permissions:
-  contents: read
+permissions: {}
 jobs:
   e2e:
     runs-on: ubuntu-latest
