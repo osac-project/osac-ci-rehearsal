@@ -2,8 +2,7 @@ name: quiet probe
 on:
   pull_request:
 permissions:
-  issues: write
-  pull-requests: read
+  pull-requests: write
 jobs:
   probe:
     runs-on: ubuntu-latest
@@ -17,4 +16,4 @@ jobs:
           cid=$(gh api "repos/${REPO}/issues/${PR}/comments" --jq '.[]|select(.body|contains("osac-ci:manual-run"))|.id' | head -1)
           echo "comment id: ${cid}"
           echo "GET answered: $(gh api -i "repos/${REPO}/issues/comments/${cid}" 2>&1 | head -1)"
-          echo "PATCH answered: $(gh api -i -X PATCH "repos/${REPO}/issues/comments/${cid}" -f body='probe (issues write, pull-requests read)' 2>&1 | head -1)"
+          echo "PATCH answered: $(gh api -i -X PATCH "repos/${REPO}/issues/comments/${cid}" -f body='probe (pull-requests write only)' 2>&1 | head -1)"
