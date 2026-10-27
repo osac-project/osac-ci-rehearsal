@@ -4,14 +4,11 @@ name: E2E for pull requests
 run-name: >-
   ${{ github.event_name == 'workflow_dispatch' && format('E2E #{0} (started by hand)', inputs.number) ||
   github.event_name == 'issue_comment' && format('E2E #{0} (suites asked for in a comment)', github.event.issue.number) ||
-  github.event_name == 'pull_request_target' && format('Cheap jobs #{0} · {1}', github.event.pull_request.number, github.event.pull_request.head.ref) ||
   github.event.workflow_run.pull_requests[0].number && format('E2E #{0} · {1}',
   github.event.workflow_run.pull_requests[0].number, github.event.workflow_run.head_branch) ||
   format('E2E · {0}:{1}', github.event.workflow_run.head_repository.owner.login, github.event.workflow_run.head_branch) }}
 
 on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out; the suites run the approved commit
-  pull_request_target:  # the controller starts the cheap jobs of a pull request that opened or got a commit
-    types: [opened, reopened, synchronize]
   workflow_run:
     workflows: ["CI Lint", "CI Unit", "CI Integration", "E2E review relay", "E2E comment", "E2E Alpha Stub"]  # the cheap jobs and alpha run as runs of their own
     types: [requested, completed]
@@ -30,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@b4b407ef79226d7d63c02c78888c991331ee003e  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@8284fb8e646a7970f6784ee8508c5ba9e9512c03  # osac-ci branch autopilot-cheap-stage (unreleased)
     with:
       lines-kind: statuses
     permissions:
@@ -44,7 +41,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@b4b407ef79226d7d63c02c78888c991331ee003e  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@8284fb8e646a7970f6784ee8508c5ba9e9512c03  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
     with:
@@ -85,7 +82,7 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@b4b407ef79226d7d63c02c78888c991331ee003e  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@8284fb8e646a7970f6784ee8508c5ba9e9512c03  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: write

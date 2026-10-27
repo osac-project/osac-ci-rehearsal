@@ -1,0 +1,18 @@
+---
+# The front door of the cheap stage (osac-ci docs/CALLERS.md): when a pull request opens or gets a commit, the controller
+# starts its cheap jobs (ci-lint.yml, ci-unit.yml, ci-integration.yml) as runs of their own as the OSAC CI app. It runs from
+# the default branch and checks out nothing of the pull request.
+name: Autopilot
+
+on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out; the jobs run from the default branch
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  start:
+    uses: osac-project/osac-ci/.github/workflows/cheap-start.yml@8284fb8e646a7970f6784ee8508c5ba9e9512c03  # osac-ci branch autopilot-cheap-stage (unreleased)
+    permissions: {}
+    secrets:
+      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
