@@ -11,7 +11,9 @@ permissions: {}
 
 jobs:
   comment:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@5aad6bfd62a151d0527c1d6274c440dcaa443eb3  # v1.3.5
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@7db687d4ee817718f283c37b6eced293551b4e1f  # trial: osac-ci branch cheap-jobs (unreleased)
+    with:
+      cheap-workflows: '["CI", "Autopilot demo"]'
     permissions: {}
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
