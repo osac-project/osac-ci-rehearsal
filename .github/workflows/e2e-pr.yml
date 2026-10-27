@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@0496e39e18d3f4a12b63ed96b7c8f9ebe1d10923  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@dc67ebb06a705779f8b7aa845d9c6457ab2a16c7  # osac-ci branch autopilot-cheap-stage (unreleased)
     with:
       lines-kind: statuses
     permissions:
@@ -41,7 +41,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@0496e39e18d3f4a12b63ed96b7c8f9ebe1d10923  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@dc67ebb06a705779f8b7aa845d9c6457ab2a16c7  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
     with:
@@ -82,7 +82,7 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@0496e39e18d3f4a12b63ed96b7c8f9ebe1d10923  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@dc67ebb06a705779f8b7aa845d9c6457ab2a16c7  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: write
