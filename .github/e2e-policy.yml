@@ -3,6 +3,8 @@ repo: osac-project/osac-ci-rehearsal
 path_filters:
   mode: enforce
   file: filters/ci-filters.yml
+e2e:
+  wait_for_ci: true  # the suites start after the CI check (the cheap jobs the controller starts) has passed
 jobs:
   e2e-alpha:
     kind: e2e
