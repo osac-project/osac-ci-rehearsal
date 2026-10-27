@@ -1,7 +1,7 @@
 name: CI
+# For the merge queue only: a pull request's cheap jobs are started by the controller (ci-lint.yml, ci-unit.yml,
+# ci-integration.yml), and the CI check on a pull request is the sum the app writes of them.
 on:
-  pull_request:
-    branches: [main]
   merge_group:
 permissions:
   contents: read

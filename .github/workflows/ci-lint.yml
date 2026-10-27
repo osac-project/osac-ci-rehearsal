@@ -1,0 +1,51 @@
+---
+# A cheap job of the pull request that the controller (osac-ci, as the OSAC CI app) starts as a run of its own when a pull
+# request opens or gets a commit, and whose line (CI / lint) it writes; the name of the run is how its end is recognised.
+name: CI Lint
+run-name: "CI job · lint · #${{ inputs.pr-number }} · ${{ inputs.sha }}"  # quoted: an unquoted " #" starts a YAML comment
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo: {type: string, required: true}
+      sha: {type: string, required: true}
+      pr-number: {type: string, required: true}
+      fork-pr-author: {type: string, default: ""}
+      fork-pr-author-association: {type: string, default: ""}
+
+permissions: {}
+
+# A newer commit of the pull request stops the run of the old one
+concurrency:
+  group: ci-lint-${{ inputs.pr-number }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@b4b407ef79226d7d63c02c78888c991331ee003e  # osac-ci branch autopilot-cheap-stage (unreleased)
+    permissions:
+      contents: read
+      pull-requests: read
+    with:
+      repo: ${{ inputs.repo }}
+      sha: ${{ inputs.sha }}
+      pr-number: ${{ inputs.pr-number }}
+  lint:
+    name: lint
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.sha }}
+          persist-credentials: false
+      - env:
+          ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          sleep 10
+          # a failure to retest: with demo/fail-lint in the commit, the first attempt of a run fails and a re-run passes
+          if [ -e demo/fail-lint ] && [ "${ATTEMPT}" = 1 ]; then echo "demo/fail-lint exists: the first attempt fails on purpose"; exit 1; fi
