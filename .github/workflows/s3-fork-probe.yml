@@ -2,7 +2,8 @@
 # SPIKE S3 of the Autopilot plan (remove after the spike): what the code of a pull request can reach when a cheap job of it
 # runs as a run of its own, started by `workflow_dispatch` (the way the E2E suites run), with the job permission the cheap
 # stage would have (contents: read) and no secret mapped. The probe prints only the NAMES of environment variables, never
-# values. `actions/checkout` refuses to check out fork code in a `pull_request_target` or `workflow_run` job unless the step
+# values. The cache question (can the code of a pull request write to the default branch's cache scope?) is NOT measured: it
+# would need a credential-bearing action of the checkout, and is documented instead. `actions/checkout` refuses to check out fork code in a `pull_request_target` or `workflow_run` job unless the step
 # opts in with `allow-unsafe-pr-checkout`; a `workflow_dispatch` run is not guarded, and nothing opts in anywhere here.
 name: S3 fork probe
 run-name: "S3 probe · ${{ inputs.sha }}"
@@ -51,11 +52,19 @@ jobs:
           persist-credentials: false
       - name: Run a script of the pull request (no token mapped, no secret mapped)
         run: bash pr/s3/probe.sh
-      - name: Run a script of the pull request with the read-only token mapped into it
+      # What the read-only token can write is a question about the job's permissions, not about the code of the pull
+      # request, so it is asked here, by this workflow's own code. No credential is mapped into anything that comes from the
+      # checkout, and no action of the checkout is run: the probe above only sees what a plain script sees.
+      - name: What the token of this job may write (this workflow's own code; a 403 is the right answer for each)
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           NUMBER: ${{ inputs.issue }}
-        run: bash pr/s3/write-attempts.sh
-      - name: Run a local action of the pull request (it gets the runtime credentials of the job)
-        uses: ./pr/s3/action
+        run: |
+          api="https://api.github.com/repos/${REPO}"
+          code() { curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${GH_TOKEN}" -H 'Accept: application/vnd.github+json' "$@"; }
+          echo "comment on the pull request: $(code -X POST "$api/issues/${NUMBER}/comments" -d '{"body":"s3 probe"}')"
+          echo "label on the pull request:   $(code -X POST "$api/issues/${NUMBER}/labels" -d '{"labels":["s3-probe"]}')"
+          echo "create a ref:                $(code -X POST "$api/git/refs" -d '{"ref":"refs/heads/s3-probe","sha":"0000000000000000000000000000000000000000"}')"
+          echo "dispatch a workflow:         $(code -X POST "$api/actions/workflows/ci.yml/dispatches" -d '{"ref":"main"}')"
+          echo "read the repository:         $(code "$api")"
