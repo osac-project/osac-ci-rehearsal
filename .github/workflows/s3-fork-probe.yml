@@ -29,9 +29,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      # Anyone with write access can dispatch this workflow with any input, and a later step maps the token into the code
-      # it runs, so the input is not believed: the code must be this repository's, the head of the probe branch, and
-      # touch nothing outside s3/.
+      # Anyone with write access can dispatch this workflow with any input, and the code it checks out is run, so the input
+      # is not believed: the code must be this repository's, the head of the probe branch, and touch nothing outside s3/.
       - name: Check that the commit is the probe code
         env:
           GH_TOKEN: ${{ github.token }}
