@@ -1,0 +1,21 @@
+---
+# SPIKE S6 (remove after the spike): the run that `s6-prt.yml` dispatches.
+name: S6 dispatched
+run-name: "S6 dispatched · ${{ inputs.sha }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: The commit the run is for
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  quick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: echo ok

@@ -1,0 +1,38 @@
+---
+# SPIKE S3 of the Autopilot plan (remove after the spike): what the code of a pull request from a FORK can reach when it runs
+# in a pull_request_target job of the default branch, with the job permission the cheap stage would have (contents: read) and
+# no secret mapped. The probe prints only the NAMES of environment variables, never values. The run is tied to the paths
+# s3/**, so no other pull request runs it.
+name: S3 fork probe
+run-name: "S3 probe · #${{ github.event.pull_request.number }} · ${{ github.event.pull_request.head.sha }}"
+
+on:  # zizmor: ignore[dangerous-triggers] -- spike on the rehearsal repository: runs the code of a pull request on purpose, to see what it can reach
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    paths: ['s3/**']
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          path: pr
+          persist-credentials: false
+      - name: Run a script of the pull request (no token mapped, no secret mapped)
+        run: bash pr/s3/probe.sh
+      - name: Run a script of the pull request with the read-only token mapped into it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: bash pr/s3/write-attempts.sh
+      - name: Run a local action of the pull request (it gets the runtime credentials of the job)
+        uses: ./pr/s3/action

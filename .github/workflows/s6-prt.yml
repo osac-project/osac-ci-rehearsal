@@ -1,0 +1,33 @@
+---
+# SPIKE S6 (remove after the spike): the same trivial job on `pull_request_target`, and a job that dispatches a run of
+# `s6-dispatched.yml` (the model where the controller starts each cheap job as a run of its own).
+name: S6 pull_request_target
+run-name: "S6 prt · ${{ github.event.pull_request.head.sha }}"
+
+on:  # zizmor: ignore[dangerous-triggers] -- spike on the rehearsal repository: nothing of the pull request is checked out
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    paths: ['s6/**']
+
+permissions: {}
+
+jobs:
+  quick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: echo ok
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: write
+    steps:
+      - name: Start the dispatched run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          gh api -X POST "repos/${REPO}/actions/workflows/s6-dispatched.yml/dispatches" -f ref=main -f "inputs[sha]=${SHA}"
