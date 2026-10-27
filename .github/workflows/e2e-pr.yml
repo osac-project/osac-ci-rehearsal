@@ -27,9 +27,9 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@bff69ce3deafc6f6f7d04a49db00ff16c379241f  # v1.3.2
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@5aad6bfd62a151d0527c1d6274c440dcaa443eb3  # v1.3.5
     with:
-      lines-kind: checks
+      lines-kind: statuses
     permissions:
       contents: read
       pull-requests: write
@@ -41,11 +41,11 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@bff69ce3deafc6f6f7d04a49db00ff16c379241f  # v1.3.2
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@5aad6bfd62a151d0527c1d6274c440dcaa443eb3  # v1.3.5
     permissions:
       contents: read
     with:
-      lines-kind: checks
+      lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
       dispatched-runs: ${{ needs.decide.outputs.dispatched-runs }}
@@ -58,7 +58,6 @@ jobs:
     permissions:
       contents: read
       statuses: read  # the beta stub reads the earlier lines of its suite (a called job cannot have more than its caller gives)
-      checks: read  # the lines are check runs of the app now
     uses: ./.github/workflows/e2e-beta.yml
     with:
       repo: ${{ needs.decide.outputs.head-repo }}
@@ -83,12 +82,12 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@bff69ce3deafc6f6f7d04a49db00ff16c379241f  # v1.3.2
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@5aad6bfd62a151d0527c1d6274c440dcaa443eb3  # v1.3.5
     permissions:
       contents: read
       pull-requests: write
     with:
-      lines-kind: checks
+      lines-kind: statuses
       sha: ${{ needs.decide.outputs.sha }}
       suites: ${{ needs.decide.outputs.suites }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
