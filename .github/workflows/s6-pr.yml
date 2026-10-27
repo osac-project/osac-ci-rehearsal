@@ -1,0 +1,18 @@
+---
+# SPIKE S6 of the Autopilot plan (remove after the spike): latency of a trivial job on `pull_request`.
+name: S6 pull_request
+run-name: "S6 pr · ${{ github.event.pull_request.head.sha }}"
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths: ['s6/**']
+
+permissions: {}
+
+jobs:
+  quick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: echo ok
