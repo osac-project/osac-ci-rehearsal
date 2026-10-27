@@ -12,7 +12,7 @@ permissions: {}
 
 jobs:
   start:
-    uses: osac-project/osac-ci/.github/workflows/cheap-start.yml@cb4079c6476134f1936d43efdcfe724d6782b2e8  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/cheap-start.yml@0496e39e18d3f4a12b63ed96b7c8f9ebe1d10923  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read  # the policy of the default branch
     secrets:
