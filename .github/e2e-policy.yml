@@ -30,3 +30,17 @@ jobs:
     check: "E2E / Gamma Stub"
     suite: gamma
     manual_only: true
+  # The cheap jobs: started by the controller as runs of their own when a pull request opens or gets a commit; their lines
+  # are the app's, and the app adds them up into the required CI check.
+  lint:
+    kind: cheap
+    check: "CI / lint"
+    workflow: ci-lint.yml
+  unit:
+    kind: cheap
+    check: "CI / unit"
+    workflow: ci-unit.yml
+  integration:
+    kind: cheap
+    check: "CI / integration"
+    workflow: ci-integration.yml
