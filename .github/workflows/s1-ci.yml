@@ -1,0 +1,19 @@
+---
+name: S1 spike
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions: {}
+jobs:
+  CI:
+    name: CI
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Say where this runs
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          echo "event=${GITHUB_EVENT_NAME} GITHUB_SHA=${GITHUB_SHA} ref=${GITHUB_REF}"
+          echo "pull request head=${HEAD_SHA}"
