@@ -1,15 +1,27 @@
 ---
-# SPIKE S3 of the Autopilot plan (remove after the spike): what the code of a pull request from a FORK can reach when it runs
-# in a pull_request_target job of the default branch, with the job permission the cheap stage would have (contents: read) and
-# no secret mapped. The probe prints only the NAMES of environment variables, never values. The run is tied to the paths
-# s3/**, so no other pull request runs it.
+# SPIKE S3 of the Autopilot plan (remove after the spike): what the code of a pull request can reach when a cheap job of it
+# runs as a run of its own, started by `workflow_dispatch` (the way the E2E suites run), with the job permission the cheap
+# stage would have (contents: read) and no secret mapped. The probe prints only the NAMES of environment variables, never
+# values. `actions/checkout` refuses to check out fork code in a `pull_request_target` or `workflow_run` job unless the step
+# opts in with `allow-unsafe-pr-checkout`; a `workflow_dispatch` run is not guarded, and nothing opts in anywhere here.
 name: S3 fork probe
-run-name: "S3 probe · #${{ github.event.pull_request.number }} · ${{ github.event.pull_request.head.sha }}"
+run-name: "S3 probe · ${{ inputs.repo }} · ${{ inputs.sha }}"
 
-on:  # zizmor: ignore[dangerous-triggers] -- spike on the rehearsal repository: runs the code of a pull request on purpose, to see what it can reach
-  pull_request_target:
-    types: [opened, reopened, synchronize]
-    paths: ['s3/**']
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: The repository that holds the commit (owner/name)
+        required: true
+        type: string
+      sha:
+        description: The commit whose code is probed
+        required: true
+        type: string
+      issue:
+        description: An issue or pull request number the probe tries (and should fail) to comment on
+        default: "154"
+        type: string
 
 permissions: {}
 
@@ -22,8 +34,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ inputs.sha }}
+          repository: ${{ inputs.repo }}
           path: pr
           persist-credentials: false
       - name: Run a script of the pull request (no token mapped, no secret mapped)
@@ -32,7 +44,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          NUMBER: ${{ github.event.pull_request.number }}
+          NUMBER: ${{ inputs.issue }}
         run: bash pr/s3/write-attempts.sh
       - name: Run a local action of the pull request (it gets the runtime credentials of the job)
         uses: ./pr/s3/action
