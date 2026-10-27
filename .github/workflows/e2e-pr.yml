@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   decide:
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@7db687d4ee817718f283c37b6eced293551b4e1f  # trial: osac-ci branch cheap-jobs (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@adeb98807c04ad3aba14fe6a7c1be3a011f8e62d  # trial: osac-ci branch cheap-jobs (unreleased)
     with:
       lines-kind: statuses
       cheap-workflows: '["CI", "Autopilot demo"]'
@@ -42,7 +42,7 @@ jobs:
   track:
     needs: decide
     if: needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@7db687d4ee817718f283c37b6eced293551b4e1f  # trial: osac-ci branch cheap-jobs (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@adeb98807c04ad3aba14fe6a7c1be3a011f8e62d  # trial: osac-ci branch cheap-jobs (unreleased)
     permissions:
       contents: read
     with:
@@ -83,7 +83,7 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: always() && needs.decide.outputs.start == 'true'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@7db687d4ee817718f283c37b6eced293551b4e1f  # trial: osac-ci branch cheap-jobs (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@adeb98807c04ad3aba14fe6a7c1be3a011f8e62d  # trial: osac-ci branch cheap-jobs (unreleased)
     permissions:
       contents: read
       pull-requests: write
