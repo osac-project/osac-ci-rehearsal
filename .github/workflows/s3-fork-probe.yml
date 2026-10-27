@@ -42,7 +42,8 @@ jobs:
           if [ "${#SHA}" -ne 40 ]; then echo "::error::Not a commit."; exit 1; fi
           head=$(gh api "repos/${REPO}/branches/s3-probe-code" --jq .commit.sha)
           if [ "$head" != "$SHA" ]; then echo "::error::Not the head of s3-probe-code."; exit 1; fi
-          outside=$(gh api "repos/${REPO}/compare/main...${SHA}" --paginate --jq '.files[].filename' | grep -v '^s3/' || true)
+          changed=$(gh api "repos/${REPO}/compare/main...${SHA}" --paginate --jq '.files[].filename')
+          outside=$(grep -v '^s3/' <<<"$changed" || true)
           if [ -n "$outside" ]; then echo "::error::Changes outside s3/: $outside"; exit 1; fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
@@ -51,9 +52,17 @@ jobs:
           persist-credentials: false
       - name: Run a script of the pull request (no token mapped, no secret mapped)
         run: bash pr/s3/probe.sh
-      # What the read-only token can write is a question about the job's permissions, not about the code of the pull
-      # request, so it is asked here, by this workflow's own code. No credential is mapped into anything that comes from the
-      # checkout, and no action of the checkout is run: the probe above only sees what a plain script sees.
+
+  # What the read-only token can write is a question about the job's permissions, not about the code of the pull request, so
+  # it is asked by this workflow's own code, in a job of its own on a clean runner: the code of the checkout runs in the job
+  # above, where it could change PATH or the environment of the steps that follow it, and nothing that holds a token may
+  # follow it there. No credential is mapped into anything that comes from the checkout, and no action of the checkout runs.
+  token:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
       - name: What the token of this job may write (this workflow's own code; a 403 is the right answer for each)
         env:
           GH_TOKEN: ${{ github.token }}
