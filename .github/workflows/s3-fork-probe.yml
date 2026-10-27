@@ -5,17 +5,13 @@
 # values. `actions/checkout` refuses to check out fork code in a `pull_request_target` or `workflow_run` job unless the step
 # opts in with `allow-unsafe-pr-checkout`; a `workflow_dispatch` run is not guarded, and nothing opts in anywhere here.
 name: S3 fork probe
-run-name: "S3 probe · ${{ inputs.repo }} · ${{ inputs.sha }}"
+run-name: "S3 probe · ${{ inputs.sha }}"
 
 on:
   workflow_dispatch:
     inputs:
-      repo:
-        description: The repository that holds the commit (owner/name)
-        required: true
-        type: string
       sha:
-        description: The commit whose code is probed
+        description: The commit whose code is probed (it must be the head of branch s3-probe-code)
         required: true
         type: string
       issue:
@@ -32,10 +28,25 @@ jobs:
     permissions:
       contents: read
     steps:
+      # Anyone with write access can dispatch this workflow with any input, and a later step maps the token into the code
+      # it runs, so the input is not believed: the code must be this repository's, the head of the probe branch, and
+      # touch nothing outside s3/.
+      - name: Check that the commit is the probe code
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          case "$SHA" in "" | *[!0-9a-f]*) echo "::error::Not a commit."; exit 1 ;; esac
+          if [ "${#SHA}" -ne 40 ]; then echo "::error::Not a commit."; exit 1; fi
+          head=$(gh api "repos/${REPO}/branches/s3-probe-code" --jq .commit.sha)
+          if [ "$head" != "$SHA" ]; then echo "::error::Not the head of s3-probe-code."; exit 1; fi
+          outside=$(gh api "repos/${REPO}/compare/main...${SHA}" --paginate --jq '.files[].filename' | grep -v '^s3/' || true)
+          if [ -n "$outside" ]; then echo "::error::Changes outside s3/: $outside"; exit 1; fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           ref: ${{ inputs.sha }}
-          repository: ${{ inputs.repo }}
           path: pr
           persist-credentials: false
       - name: Run a script of the pull request (no token mapped, no secret mapped)
