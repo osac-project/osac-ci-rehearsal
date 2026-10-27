@@ -26,6 +26,7 @@ jobs:
     permissions:
       contents: read
       statuses: read  # the beta stub reads the earlier lines of its suite (a called job cannot have more than its caller gives)
+      checks: read
     uses: ./.github/workflows/e2e-beta.yml
     with:
       repo: ${{ github.repository }}

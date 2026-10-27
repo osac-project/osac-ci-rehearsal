@@ -29,7 +29,7 @@ jobs:
   decide:
     uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@bff69ce3deafc6f6f7d04a49db00ff16c379241f  # v1.3.2
     with:
-      lines-kind: statuses
+      lines-kind: checks
     permissions:
       contents: read
       pull-requests: write
@@ -45,7 +45,7 @@ jobs:
     permissions:
       contents: read
     with:
-      lines-kind: statuses
+      lines-kind: checks
       sha: ${{ needs.decide.outputs.sha }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
       dispatched-runs: ${{ needs.decide.outputs.dispatched-runs }}
@@ -58,6 +58,7 @@ jobs:
     permissions:
       contents: read
       statuses: read  # the beta stub reads the earlier lines of its suite (a called job cannot have more than its caller gives)
+      checks: read  # the lines are check runs of the app now
     uses: ./.github/workflows/e2e-beta.yml
     with:
       repo: ${{ needs.decide.outputs.head-repo }}
@@ -87,7 +88,7 @@ jobs:
       contents: read
       pull-requests: write
     with:
-      lines-kind: statuses
+      lines-kind: checks
       sha: ${{ needs.decide.outputs.sha }}
       suites: ${{ needs.decide.outputs.suites }}
       suite-checks: ${{ needs.decide.outputs.suite-checks }}
