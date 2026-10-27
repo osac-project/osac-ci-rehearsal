@@ -1,0 +1,119 @@
+---
+# A PROTOTYPE, for a live look at the cheap stage of "Autopilot" (see the plan): a controller that runs on
+# `pull_request_target`, from the default branch, with no secrets and a read-only token, and runs the cheap jobs of a pull
+# request itself. The jobs here are stubs (lint, unit, integration) and the sum is `Autopilot CI` (a demo name, not the
+# real `CI`). Nothing of the pull request is checked out: the stubs only read the list of changed files through the API.
+#
+# Try it: open a pull request, then add a file `demo/fail-unit` (or `demo/fail-lint`, `demo/fail-integration`) to make that
+# stub fail on its first attempt, and use "Re-run failed jobs" on the run (or run the failed job again): only that job runs
+# again, the others keep their result, and `Autopilot CI` is added up again. A new push stops the old run.
+# Remove this file when the demo is over.
+name: Autopilot demo
+run-name: "Autopilot demo · #${{ github.event.pull_request.number }} · ${{ github.event.pull_request.head.ref }}"
+
+on:  # zizmor: ignore[dangerous-triggers] -- prototype: runs from the default branch, no secrets, nothing checked out
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions: {}
+
+# One run per pull request: a new push stops the run of the old commit
+concurrency:
+  group: autopilot-demo-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      failing: ${{ steps.files.outputs.failing }}
+    steps:
+      - name: Read the changed files (the API only, no code is checked out)
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          files=$(gh api --paginate "repos/${REPO}/pulls/${NUMBER}/files" --jq '.[].filename')
+          echo "Changed files:"; echo "${files}"
+          failing=""
+          for job in lint unit integration; do
+            if grep -qx "demo/fail-${job}" <<<"${files}"; then failing="${failing} ${job}"; fi
+          done
+          echo "Stubs that fail on their first attempt:${failing:- none}"
+          echo "failing=${failing}" >> "${GITHUB_OUTPUT}"
+
+  lint:
+    name: lint
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Stub job
+        env:
+          FAILING: ${{ needs.plan.outputs.failing }}
+          ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          sleep 15
+          if [[ " ${FAILING} " == *" lint "* && "${ATTEMPT}" == 1 ]]; then echo "demo/fail-lint: the first attempt fails"; exit 1; fi
+          echo "lint passed (attempt ${ATTEMPT})"
+
+  unit:
+    name: unit
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Stub job
+        env:
+          FAILING: ${{ needs.plan.outputs.failing }}
+          ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          sleep 30
+          if [[ " ${FAILING} " == *" unit "* && "${ATTEMPT}" == 1 ]]; then echo "demo/fail-unit: the first attempt fails"; exit 1; fi
+          echo "unit passed (attempt ${ATTEMPT})"
+
+  integration:
+    name: integration
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Stub job
+        env:
+          FAILING: ${{ needs.plan.outputs.failing }}
+          ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          sleep 45
+          if [[ " ${FAILING} " == *" integration "* && "${ATTEMPT}" == 1 ]]; then echo "demo/fail-integration: the first attempt fails"; exit 1; fi
+          echo "integration passed (attempt ${ATTEMPT})"
+
+  # The sum, like `CI` and `E2E`: it must run when a job failed or was cancelled, and it fails unless every job passed
+  autopilot-ci:
+    name: Autopilot CI
+    needs: [plan, lint, unit, integration]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Add up the jobs
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<<"${RESULTS}"
+          if jq -e 'any(.[]; .result != "success")' <<<"${RESULTS}" >/dev/null; then
+            echo "Autopilot CI: a job did not pass"; exit 1
+          fi
+          echo "Autopilot CI: every job passed"
