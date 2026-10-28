@@ -1,7 +1,7 @@
 ---
 # A cheap job of the pull request that the controller (osac-ci, as the OSAC CI app) starts as a run of its own when a pull
 # request opens or gets a commit, and whose line (CI / lint) it writes; the name of the run is how its end is recognised.
-name: CI Lint
+name: Autopilot / CI / Lint
 run-name: "CI job · lint · #${{ inputs.pr-number }} · ${{ inputs.sha }}"  # quoted: an unquoted " #" starts a YAML comment
 
 on:

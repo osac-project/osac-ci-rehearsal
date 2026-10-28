@@ -1,5 +1,5 @@
 ---
-name: E2E Gamma Stub
+name: Autopilot / E2E / Gamma Stub
 on:
   workflow_call:
     inputs:
