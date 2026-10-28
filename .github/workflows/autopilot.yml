@@ -62,7 +62,7 @@ jobs:
           permission-actions: write  # start the cheap jobs
           permission-statuses: write  # their lines
           permission-contents: read  # the CODEOWNERS of the base branch, for the code owners row
-      - uses: osac-project/osac-ci/.github/actions/early-comment@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/early-comment@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action == 'opened' || github.event.action == 'reopened'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -71,7 +71,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           author: ${{ github.event.pull_request.user.login }}
           fresh: ${{ github.event.action == 'opened' }}
-      - uses: osac-project/osac-ci/.github/actions/manual-status@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/manual-status@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action != 'opened' && github.event.action != 'reopened'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -84,7 +84,7 @@ jobs:
             .github/filters/ci-filters.yml
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - uses: osac-project/osac-ci/.github/actions/cheap-start@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/cheap-start@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -92,7 +92,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
           lines-kind: statuses
-      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           repo: ${{ github.repository }}
@@ -102,7 +102,7 @@ jobs:
 
   decide:
     if: github.event_name != 'pull_request_target'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
     with:
       lines-kind: statuses
     permissions:
@@ -116,7 +116,7 @@ jobs:
   track:
     needs: decide
     if: github.event_name != 'pull_request_target' && (needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
     with:
@@ -157,7 +157,7 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: github.event_name != 'pull_request_target' && (always() && needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: write
