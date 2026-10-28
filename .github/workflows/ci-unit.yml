@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   verify:
-    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@3ded6fd5b105448eef0b487e8d22651eaeb7c397  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: read
