@@ -37,26 +37,72 @@ on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out
 permissions: {}
 
 jobs:
-  # a pull request opened, was reopened or got a commit: start its cheap jobs as runs of their own
-  start:
-    if: github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
-    uses: osac-project/osac-ci/.github/workflows/cheap-start.yml@fbb5510199a143d1c7e61e59182fe1fb16e32771  # osac-ci branch autopilot-cheap-stage (unreleased)
+  # The pull request events, in one job named for what it is (the row on the pull request while it runs; the finished run is
+  # deleted by the next decision, and the app's own `CI Autopilot` check, with the same name and the app's icon, is what stays):
+  # the control comment is written the moment a pull request opens (first, before the bots that post a few seconds later),
+  # the cheap jobs are started as runs of their own, and the summary check says what was done.
+  autopilot:
+    name: CI Autopilot
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read  # the policy of the default branch
-    secrets:
-      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
-
-  # the control comment of the pull request: written the moment it opens, refreshed when the queue or auto-merge changes
-  comment:
-    if: github.event_name == 'pull_request_target'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-comment.yml@fbb5510199a143d1c7e61e59182fe1fb16e32771  # osac-ci branch autopilot-cheap-stage (unreleased)
-    permissions: {}
-    secrets:
-      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
+    steps:
+      - name: Token of the OSAC CI app
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
+        with:
+          app-id: "4966101"
+          private-key: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
+          permission-pull-requests: write  # the comment
+          permission-members: read
+          permission-issues: write  # and its edits
+          permission-checks: write  # the CI and CI Autopilot checks
+          permission-actions: write  # start the cheap jobs
+          permission-statuses: write  # their lines
+          permission-contents: read  # the CODEOWNERS of the base branch, for the code owners row
+      - uses: osac-project/osac-ci/.github/actions/early-comment@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          repo: ${{ github.repository }}
+          head-sha: ${{ github.event.pull_request.head.sha }}
+          number: ${{ github.event.pull_request.number }}
+          author: ${{ github.event.pull_request.user.login }}
+          fresh: ${{ github.event.action == 'opened' }}
+      - uses: osac-project/osac-ci/.github/actions/manual-status@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+        if: github.event.action != 'opened' && github.event.action != 'reopened'
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          repo: ${{ github.repository }}
+          number: ${{ github.event.pull_request.number }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:  # the default branch (what a pull_request_target run checks out), never the pull request
+          sparse-checkout: |
+            .github/e2e-policy.yml
+            .github/filters/ci-filters.yml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: osac-project/osac-ci/.github/actions/cheap-start@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+        if: github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize'
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          repo: ${{ github.repository }}
+          number: ${{ github.event.pull_request.number }}
+          policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
+          lines-kind: statuses
+      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
+        with:
+          github-token: ${{ steps.app-token.outputs.token }}
+          repo: ${{ github.repository }}
+          number: ${{ github.event.pull_request.number }}
+          policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
+          event: pull request ${{ github.event.action }}
 
   decide:
     if: github.event_name != 'pull_request_target'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@fbb5510199a143d1c7e61e59182fe1fb16e32771  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
     with:
       lines-kind: statuses
     permissions:
@@ -70,7 +116,7 @@ jobs:
   track:
     needs: decide
     if: github.event_name != 'pull_request_target' && (needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@fbb5510199a143d1c7e61e59182fe1fb16e32771  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
     with:
@@ -111,7 +157,7 @@ jobs:
   finish:
     needs: [decide, track, beta, gamma]
     if: github.event_name != 'pull_request_target' && (always() && needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@fbb5510199a143d1c7e61e59182fe1fb16e32771  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@378109e4ffbe4335597c63ccdb1b56cd9a7d20ee  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: write

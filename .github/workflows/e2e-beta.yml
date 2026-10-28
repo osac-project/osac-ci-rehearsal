@@ -36,7 +36,7 @@ jobs:
           if [ "beta" = beta ] && [ -e beta/fail ]; then echo "beta/fail exists: the stub suite fails on purpose"; exit 1; fi
           # beta/fail-once: fails the first time on a commit and passes when run again (it looks for an earlier failure of its line)
           if [ -e beta/fail-once ]; then
-            earlier=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SHA}/statuses" --jq '[.[] | select(.context == "E2E / Beta Stub" and .state == "failure")] | length' || echo 0)
+            earlier=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${SHA}/statuses" --jq '[.[] | select(.context == "CI Autopilot / E2E / Beta Stub" and .state == "failure")] | length' || echo 0)
             if [ "${earlier}" = 0 ]; then echo "beta/fail-once exists and beta has not failed on this commit yet: the stub fails"; exit 1; fi
             echo "beta failed on this commit before: the stub passes this time"
           fi
