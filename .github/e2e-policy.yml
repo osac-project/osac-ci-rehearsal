@@ -3,6 +3,9 @@ repo: osac-project/osac-ci-rehearsal
 path_filters:
   mode: enforce
   file: filters/ci-filters.yml
+jira_reference:
+  check: "CI Autopilot / Jira reference"
+  mode: title  # the rehearsal repository has no Prow: the title decides
 e2e:
   wait_for_ci: true  # the suites start after the CI check (the cheap jobs the controller starts) has passed
 jobs:
