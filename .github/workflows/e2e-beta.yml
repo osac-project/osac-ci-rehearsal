@@ -1,5 +1,5 @@
 ---
-name: E2E Beta Stub
+name: Autopilot / E2E / Beta Stub
 on:
   workflow_call:
     inputs:

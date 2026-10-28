@@ -1,5 +1,5 @@
 ---
-name: E2E Alpha Stub
+name: Autopilot / E2E / Alpha Stub
 # Started by the decision as a run of its own (workflow_dispatch); the name of the run is how its end is recognised.
 run-name: "E2E suite · alpha · #${{ inputs.pr-number }} · ${{ inputs.sha }}"  # quoted: an unquoted " #" starts a YAML comment
 on:
