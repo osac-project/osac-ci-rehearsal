@@ -206,6 +206,7 @@ jobs:
     if: contains(needs.queue-plan.outputs.cheap, '"lint"')
     permissions:
       contents: read
+      pull-requests: read  # the nested verify job of the workflow asks for it (a pull request's inputs are checked; here it is skipped)
     uses: ./.github/workflows/ci-lint.yml
     with:
       repo: ${{ github.repository }}
@@ -217,6 +218,7 @@ jobs:
     if: contains(needs.queue-plan.outputs.cheap, '"unit"')
     permissions:
       contents: read
+      pull-requests: read  # the nested verify job of the workflow asks for it (a pull request's inputs are checked; here it is skipped)
     uses: ./.github/workflows/ci-unit.yml
     with:
       repo: ${{ github.repository }}
@@ -228,6 +230,7 @@ jobs:
     if: contains(needs.queue-plan.outputs.cheap, '"integration"')
     permissions:
       contents: read
+      pull-requests: read  # the nested verify job of the workflow asks for it (a pull request's inputs are checked; here it is skipped)
     uses: ./.github/workflows/ci-integration.yml
     with:
       repo: ${{ github.repository }}
