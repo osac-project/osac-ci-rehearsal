@@ -5,24 +5,32 @@ name: Autopilot / CI / Lint
 run-name: "CI job · lint · #${{ inputs.pr-number }} · ${{ inputs.sha }}"  # quoted: an unquoted " #" starts a YAML comment
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # a pull request: started by the controller
     inputs:
       repo: {type: string, required: true}
       sha: {type: string, required: true}
       pr-number: {type: string, required: true}
       fork-pr-author: {type: string, default: ""}
       fork-pr-author-association: {type: string, default: ""}
+  workflow_call:  # a merge queue entry: a job of the entry's run (the commit is the event's, not an input anyone gave)
+    inputs:
+      repo: {type: string, required: true}
+      sha: {type: string, required: true}
+      pr-number: {type: string, default: ""}
+      fork-pr-author: {type: string, default: ""}
+      fork-pr-author-association: {type: string, default: ""}
 
 permissions: {}
 
-# A newer commit of the pull request stops the run of the old one
+# A newer commit of the pull request stops the run of the old one (a queue entry has no pull request number: its commit)
 concurrency:
-  group: ci-lint-${{ inputs.pr-number }}
+  group: ci-lint-${{ inputs.pr-number || inputs.sha }}
   cancel-in-progress: true
 
 jobs:
   verify:
-    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+    if: inputs.pr-number != ''  # a pull request's inputs are checked against it; a queue entry's are the event's
+    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: read
@@ -33,6 +41,7 @@ jobs:
   lint:
     name: lint
     needs: verify
+    if: ${{ !cancelled() && (needs.verify.result == 'success' || needs.verify.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

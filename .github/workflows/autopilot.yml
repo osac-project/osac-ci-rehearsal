@@ -10,7 +10,8 @@
 name: Autopilot
 # The title is for people: the decision does not read it (it finds the run of an older commit by that commit's E2E line).
 run-name: >-
-  ${{ github.event_name == 'pull_request_target' && format('Autopilot #{0} ({1}) · {2}', github.event.pull_request.number, github.event.action, github.event.pull_request.head.ref) ||
+  ${{ github.event_name == 'merge_group' && format('Queue entry · {0}', github.event.merge_group.head_ref) ||
+  github.event_name == 'pull_request_target' && format('Autopilot #{0} ({1}) · {2}', github.event.pull_request.number, github.event.action, github.event.pull_request.head.ref) ||
   github.event_name == 'workflow_dispatch' && format('E2E #{0} (started by hand)', inputs.number) ||
   github.event_name == 'issue_comment' && format('E2E #{0} (suites asked for in a comment)', github.event.issue.number) ||
   github.event.workflow_run.pull_requests[0].number && format('E2E #{0} · {1}',
@@ -18,6 +19,7 @@ run-name: >-
   format('E2E · {0}:{1}', github.event.workflow_run.head_repository.owner.login, github.event.workflow_run.head_branch) }}
 
 on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out; the suites run the approved commit
+  merge_group:  # a queue entry: the same jobs, inline, and the same CI Autopilot check on its commit
   pull_request_target:
     types: [opened, reopened, synchronize, edited, labeled, unlabeled, closed, enqueued, dequeued, auto_merge_enabled, auto_merge_disabled]
   workflow_run:
@@ -62,7 +64,7 @@ jobs:
           permission-actions: write  # start the cheap jobs
           permission-statuses: write  # their lines
           permission-contents: read  # the CODEOWNERS of the base branch, for the code owners row
-      - uses: osac-project/osac-ci/.github/actions/early-comment@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/early-comment@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action == 'opened' || github.event.action == 'reopened'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -71,7 +73,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           author: ${{ github.event.pull_request.user.login }}
           fresh: ${{ github.event.action == 'opened' }}
-      - uses: osac-project/osac-ci/.github/actions/manual-status@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/manual-status@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action != 'opened' && github.event.action != 'reopened'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -84,7 +86,7 @@ jobs:
             .github/filters/ci-filters.yml
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - uses: osac-project/osac-ci/.github/actions/cheap-start@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/cheap-start@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -92,7 +94,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
           lines-kind: statuses
-      - uses: osac-project/osac-ci/.github/actions/jira-reference@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/jira-reference@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
         if: github.event.action != 'closed' && github.event.action != 'enqueued' && github.event.action != 'dequeued' && !startsWith(github.event.action, 'auto_merge')
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -100,7 +102,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
           lines-kind: statuses
-      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           repo: ${{ github.repository }}
@@ -110,8 +112,8 @@ jobs:
 
   decide:
     name: Decide
-    if: github.event_name != 'pull_request_target'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+    if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group'
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
     with:
       lines-kind: statuses
     permissions:
@@ -125,8 +127,8 @@ jobs:
   track:
     name: E2E / track
     needs: decide
-    if: github.event_name != 'pull_request_target' && (needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+    if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group' && (needs.decide.outputs.start == 'true')
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
     with:
@@ -140,7 +142,7 @@ jobs:
   beta:
     name: E2E / beta
     needs: decide
-    if: github.event_name != 'pull_request_target' && (needs.decide.outputs.start == 'true' && contains(needs.decide.outputs.suites, '"beta"'))
+    if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group' && (needs.decide.outputs.start == 'true' && contains(needs.decide.outputs.suites, '"beta"'))
     permissions:
       contents: read
       statuses: read  # the beta stub reads the earlier lines of its suite (a called job cannot have more than its caller gives)
@@ -155,7 +157,7 @@ jobs:
   gamma:
     name: E2E / gamma
     needs: decide
-    if: github.event_name != 'pull_request_target' && (needs.decide.outputs.start == 'true' && contains(needs.decide.outputs.suites, '"gamma"'))
+    if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group' && (needs.decide.outputs.start == 'true' && contains(needs.decide.outputs.suites, '"gamma"'))
     permissions:
       contents: read
     uses: ./.github/workflows/e2e-gamma.yml
@@ -169,8 +171,8 @@ jobs:
   finish:
     name: E2E / finish
     needs: [decide, track, beta, gamma]
-    if: github.event_name != 'pull_request_target' && (always() && needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@bcbe2206c01b8fb5fb42c2e0bbdab20cc7489638  # osac-ci branch autopilot-cheap-stage (unreleased)
+    if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group' && (always() && needs.decide.outputs.start == 'true')
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: write
@@ -185,5 +187,89 @@ jobs:
       manual: ${{ needs.decide.outputs.manual }}
       selected-checks: ${{ needs.decide.outputs.selected-checks }}
       results: ${{ toJSON(needs) }}
+    secrets:
+      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
+
+  # A merge queue entry (phase A: next to the old flow in ci.yml, jira-reference.yml and e2e-queue.yml): the plan lists the
+  # cheap jobs and suites the entry needs, they run inline as jobs of this run, and one job writes the CI Autopilot check.
+  queue-plan:
+    name: Plan the queue entry
+    if: github.event_name == 'merge_group'
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
+    permissions:
+      contents: read
+      actions: write
+
+  queue-lint:
+    name: lint
+    needs: queue-plan
+    if: contains(needs.queue-plan.outputs.cheap, '"lint"')
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci-lint.yml
+    with:
+      repo: ${{ github.repository }}
+      sha: ${{ github.event.merge_group.head_sha }}
+
+  queue-unit:
+    name: unit
+    needs: queue-plan
+    if: contains(needs.queue-plan.outputs.cheap, '"unit"')
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci-unit.yml
+    with:
+      repo: ${{ github.repository }}
+      sha: ${{ github.event.merge_group.head_sha }}
+
+  queue-integration:
+    name: integration
+    needs: queue-plan
+    if: contains(needs.queue-plan.outputs.cheap, '"integration"')
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci-integration.yml
+    with:
+      repo: ${{ github.repository }}
+      sha: ${{ github.event.merge_group.head_sha }}
+
+  queue-alpha:
+    name: alpha
+    needs: queue-plan
+    if: contains(needs.queue-plan.outputs.suites, '"alpha"')
+    permissions:
+      contents: read
+    uses: ./.github/workflows/e2e-alpha.yml
+    with:
+      repo: ${{ github.repository }}
+      sha: ${{ github.event.merge_group.head_sha }}
+
+  queue-beta:
+    name: beta
+    needs: queue-plan
+    if: contains(needs.queue-plan.outputs.suites, '"beta"')
+    permissions:
+      contents: read
+      statuses: read  # the beta stub reads the earlier lines of its suite (a called job cannot have more than its caller gives)
+    uses: ./.github/workflows/e2e-beta.yml
+    with:
+      repo: ${{ github.repository }}
+      sha: ${{ github.event.merge_group.head_sha }}
+
+  # One job that looks after the entry: opens the CI Autopilot check, watches the jobs and the other required checks of the
+  # commit, writes the check at once on the first failure and stops everything that still runs (osac-ci docs/CALLERS.md).
+  queue-result:
+    name: Queue result
+    needs: queue-plan
+    if: always() && github.event_name == 'merge_group'
+    uses: osac-project/osac-ci/.github/workflows/autopilot-queue-result.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
+    permissions:
+      actions: write
+      contents: read
+    with:
+      sha: ${{ github.event.merge_group.head_sha }}
+      branch: ${{ github.event.merge_group.base_ref }}
+      plan-result: ${{ needs.queue-plan.result }}
+      jobs: ${{ needs.queue-plan.outputs.jobs }}
     secrets:
       OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
