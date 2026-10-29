@@ -30,7 +30,7 @@ concurrency:
 jobs:
   verify:
     if: inputs.pr-number != ''  # a pull request's inputs are checked against it; a queue entry's are the event's
-    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@e0cbcc3c8aef7e5fc24d2e0576d2807932704f5f  # osac-ci branch autopilot-cheap-stage (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/suite-inputs.yml@705213249202203637ca2f0d57205963921a8f69  # osac-ci branch autopilot-cheap-stage (unreleased)
     permissions:
       contents: read
       pull-requests: read
