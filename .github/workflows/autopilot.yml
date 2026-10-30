@@ -64,7 +64,7 @@ jobs:
           permission-actions: write  # start the cheap jobs
           permission-statuses: write  # their lines
           permission-contents: read  # the CODEOWNERS of the base branch, for the code owners row
-      - uses: osac-project/osac-ci/.github/actions/early-comment@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/early-comment@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
         if: github.event.action == 'opened' || github.event.action == 'reopened'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -73,7 +73,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           author: ${{ github.event.pull_request.user.login }}
           fresh: ${{ github.event.action == 'opened' }}
-      - uses: osac-project/osac-ci/.github/actions/manual-status@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/manual-status@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
         if: github.event.action != 'opened' && github.event.action != 'reopened'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -86,7 +86,7 @@ jobs:
             .github/filters/ci-filters.yml
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - uses: osac-project/osac-ci/.github/actions/cheap-start@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/cheap-start@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
         if: github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize'
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -94,7 +94,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
           lines-kind: statuses
-      - uses: osac-project/osac-ci/.github/actions/jira-reference@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/jira-reference@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
         if: github.event.action != 'closed' && github.event.action != 'enqueued' && github.event.action != 'dequeued' && !startsWith(github.event.action, 'auto_merge')
         with:
           github-token: ${{ steps.app-token.outputs.token }}
@@ -102,7 +102,7 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           policy-file: ${{ github.workspace }}/.github/e2e-policy.yml
           lines-kind: statuses
-      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+      - uses: osac-project/osac-ci/.github/actions/autopilot-summary@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           repo: ${{ github.repository }}
@@ -113,7 +113,7 @@ jobs:
   decide:
     name: Decide
     if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group'
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-decide.yml@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
     with:
       lines-kind: statuses
     permissions:
@@ -128,7 +128,7 @@ jobs:
     name: E2E / track
     needs: decide
     if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group' && (needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-track.yml@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
     permissions:
       contents: read
     with:
@@ -172,7 +172,7 @@ jobs:
     name: E2E / finish
     needs: [decide, track, beta, gamma]
     if: github.event_name != 'pull_request_target' && github.event_name != 'merge_group' && (always() && needs.decide.outputs.start == 'true')
-    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-finish.yml@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
     permissions:
       contents: read
       pull-requests: write
@@ -195,7 +195,7 @@ jobs:
   queue-plan:
     name: Plan the queue entry
     if: github.event_name == 'merge_group'
-    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/e2e-queue-plan.yml@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
     permissions:
       contents: read
       actions: write
@@ -267,7 +267,7 @@ jobs:
     name: Queue result
     needs: queue-plan
     if: always() && github.event_name == 'merge_group'
-    uses: osac-project/osac-ci/.github/workflows/autopilot-queue-result.yml@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/autopilot-queue-result.yml@d8517afc3217e521dc4ea3b770c2268b07b88584  # osac-ci branch autopilot-fast-track (unreleased)
     permissions:
       actions: write
       contents: read
