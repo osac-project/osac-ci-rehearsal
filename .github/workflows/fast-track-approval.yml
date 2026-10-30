@@ -1,0 +1,58 @@
+---
+# Fast track, way 2: an approval. Adding the label "fast-track" starts a job that waits on the environment "fast-track";
+# its required reviewers get the "Review deployments" button (on the pull request and on the run), with a comment box.
+# The comment is the reason, and the reviewer, read back from the run, is who fast-tracked.
+name: Fast track · approval
+run-name: Fast track #${{ github.event.pull_request.number }} · approval
+
+on:  # zizmor: ignore[dangerous-triggers] -- nothing of the pull request is checked out
+  pull_request_target:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  approval:
+    name: Fast track
+    if: github.event.label.name == 'fast-track'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: fast-track
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Token of the OSAC CI app
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
+        with:
+          app-id: "4966101"
+          private-key: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
+          permission-checks: write
+          permission-pull-requests: write
+          permission-issues: write
+          permission-contents: read
+      - name: Who approved, and why
+        id: approval
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          row="$(gh api "repos/$REPO/actions/runs/$GITHUB_RUN_ID/approvals" --jq 'map(select(.state == "approved")) | last')"
+          echo "actor=$(jq -r '.user.login' <<<"$row")" >> "$GITHUB_OUTPUT"
+          { echo "reason<<EOF"; jq -r '.comment' <<<"$row"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+      - name: Check and write the line
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          ACTOR: ${{ steps.approval.outputs.actor }}
+          REASON: ${{ steps.approval.outputs.reason }}
+          CHECK: Fast track (approval)
+          VIA: the approval of the environment
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ALLOW_AUTHOR: "true"  # rehearsal only
+        run: .github/scripts/fast-track.sh
