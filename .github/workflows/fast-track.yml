@@ -21,7 +21,7 @@ permissions: {}
 jobs:
   fast-track:
     name: Fast track
-    uses: osac-project/osac-ci/.github/workflows/fast-track.yml@cac20a6b23eefb18341e645fcf0c80a20c90d55f  # osac-ci branch autopilot-fast-track (unreleased)
+    uses: osac-project/osac-ci/.github/workflows/fast-track.yml@3699f61040d3817f52ac5b36bc00b33dc987baea  # osac-ci branch autopilot-fast-track (unreleased)
     permissions:
       contents: read
     with:
