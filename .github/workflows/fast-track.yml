@@ -1,0 +1,31 @@
+---
+# Fast track: a member of the ci-duty team skips every test of one pull request (osac-ci docs/CALLERS.md). "Run workflow"
+# on the Actions page, with the number of the pull request and a reason. It runs only from the default branch; the shared
+# workflow checks who runs it, and a run from any other branch is refused first thing. The run belongs to the default
+# branch, so it adds no row to a pull request: the only trace is the title of the CI Autopilot check of the commit.
+name: Fast track
+run-name: Fast track #${{ inputs.number }} · ${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      number:
+        description: Pull request number
+        required: true
+      reason:
+        description: Why (shown on the pull request)
+        required: true
+
+permissions: {}
+
+jobs:
+  fast-track:
+    name: Fast track
+    uses: osac-project/osac-ci/.github/workflows/fast-track.yml@cac20a6b23eefb18341e645fcf0c80a20c90d55f  # osac-ci branch autopilot-fast-track (unreleased)
+    permissions:
+      contents: read
+    with:
+      number: ${{ inputs.number }}
+      reason: ${{ inputs.reason }}
+    secrets:
+      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
