@@ -6,6 +6,9 @@ path_filters:
 jira_reference:
   check: "CI Autopilot / Jira reference"
   mode: title  # the rehearsal repository has no Prow: the title decides
+fast_track:
+  team: ci-duty  # only a member of this team may skip the tests of a pull request (Actions, "Fast track")
+  allow_author: true  # the rehearsal repository has one user, who writes the pull requests they try it on
 e2e:
   wait_for_ci: true  # the suites start after the CI check (the cheap jobs the controller starts) has passed
 jobs:
