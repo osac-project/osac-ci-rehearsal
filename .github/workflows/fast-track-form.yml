@@ -1,0 +1,88 @@
+---
+# Fast track, way 1: a form. "Run workflow" (Actions tab) is only there for people with write access, and the job checks
+# that the caller may fast-track and says why it did not otherwise. A comment on every new pull request links to it.
+name: Fast track · form
+run-name: Fast track #${{ inputs.number || github.event.pull_request.number }} · ${{ github.event_name == 'workflow_dispatch' && format('form, {0}', github.actor) || 'hint' }}
+
+on:  # zizmor: ignore[dangerous-triggers] -- nothing of the pull request is checked out
+  workflow_dispatch:
+    inputs:
+      number:
+        description: Pull request number
+        required: true
+      skip:
+        description: What to skip
+        type: choice
+        options: [E2E, E2E and CI]
+        default: E2E
+      reason:
+        description: Why (shown on the pull request)
+        required: true
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions: {}
+
+jobs:
+  form:
+    name: Fast track
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Token of the OSAC CI app
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
+        with:
+          app-id: "4966101"
+          private-key: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
+          permission-checks: write
+          permission-pull-requests: write
+          permission-issues: write
+          permission-contents: read
+      - name: Check who asks and write the line
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ inputs.number }}
+          ACTOR: ${{ github.actor }}
+          REASON: ${{ inputs.reason }}
+          SKIP: ${{ inputs.skip }}
+          CHECK: Fast track (form)
+          VIA: the form
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ALLOW_AUTHOR: "true"  # rehearsal only: here the person who tries it is also the author
+        run: .github/scripts/fast-track.sh
+
+  hint:
+    name: Fast track hint
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Token of the OSAC CI app
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
+        with:
+          app-id: "4966101"
+          private-key: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
+          permission-checks: write
+          permission-pull-requests: write
+          permission-issues: write
+          permission-contents: read
+      - name: Comment with the link to the form
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api -X POST "repos/$REPO/issues/$NUMBER/comments" -f body="<!-- fast-track-hint -->
+          > [!NOTE]
+          > **Fast track** (for people who may skip the E2E): [open the form](https://github.com/$REPO/actions/workflows/fast-track-form.yml), then **Run workflow** and type pull request number **$NUMBER** and a reason. The page does not offer the button to people without write access, and the job refuses anyone who may not." --jq .html_url
