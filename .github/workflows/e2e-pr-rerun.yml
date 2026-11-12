@@ -1,0 +1,20 @@
+---
+# TEMPORARY, to try osac-ci's re-run workflow (osac-ci PR "show a suite that is run again on its line") on the rehearsal
+# repository. A suite that had ended and is run again with GitHub's "Re-run" sends workflow_run in_progress for the second
+# attempt and nothing else; this workflow tells the pull request. Pinned to an unreleased osac-ci branch commit.
+name: E2E suite goes again
+on:  # zizmor: ignore[dangerous-triggers] -- no pull request code is checked out
+  workflow_run:
+    workflows: ["Autopilot / E2E / Alpha Stub"]
+    types: [in_progress]
+permissions: {}
+jobs:
+  restarted:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: osac-project/osac-ci/.github/workflows/e2e-pr-rerun.yml@51fd7200b441adc7bfab8e25142457f6ab2a7aba  # osac-ci branch suite-restart-line-rehearsal (unreleased)
+    with:
+      lines-kind: statuses
+    secrets:
+      OSAC_CI_APP_PRIVATE_KEY: ${{ secrets.OSAC_CI_APP_PRIVATE_KEY }}
